@@ -23,7 +23,7 @@ resource "aws_security_group" "security_group_ec2_test_2" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [module.sg_lb_test_2.id]
   }
   egress {
     from_port   = 0
@@ -45,7 +45,7 @@ module "ec2_test" {
 module "sg_lb_test_2" {
     source = "./modules/security_group"
     environment = var.environment
-    vpc = modules.networking.vpc_id
+    vpc = module.networking_test_2.vpc_id
     port_to_allow  = 80
     cidr_to_allow = ["0.0.0.0/0"]
 }
@@ -53,9 +53,10 @@ module "sg_lb_test_2" {
 module "tg_test_2" {
   source = "./modules/TargetGroup"
   environment = var.environment
-  vpc = modules.networking.vpc_id
+  vpc = module.networking_test_2.vpc_id
   target_type = "instance"
   tg_port = 80
-
 }
+
+
 

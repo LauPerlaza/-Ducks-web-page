@@ -13,7 +13,3 @@ variable "security_group" {
 variable "target_group" {
   type = string
 }
-
-variable "cert_arn" {
-  type = string
-}
