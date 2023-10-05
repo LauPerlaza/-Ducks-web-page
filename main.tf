@@ -23,7 +23,7 @@ resource "aws_security_group" "security_group_ec2_test_2" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [module.sg_lb_test_2.id]
+    security_groups = [module.sg_lb.sg_id]
   }
   egress {
     from_port   = 0
@@ -42,7 +42,7 @@ module "ec2_test" {
   environment   = var.environment
 }
 
-module "sg_lb_test_2" {
+module "sg_lb" {
     source = "./modules/security_group"
     environment = var.environment
     vpc = module.networking_test_2.vpc_id

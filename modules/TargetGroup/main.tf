@@ -6,11 +6,3 @@ resource "aws_lb_target_group" "tg_test_2" {
     vpc_id = var.vpc
 
   }
-
-resource "aws_lb_target_group_attachment" "test" {
-  target_group_arn = aws_lb_target_group.tg_test_2.arn
-  target_id        = aws_instance.tg_test_2.id
-  port             = 80
-}
-  
-  

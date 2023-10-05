@@ -1,4 +1,4 @@
-resource "aws_security_group" "sg_test_2" {
+resource "aws_security_group" "sg" {
   name        = "sg_test_2_${var.environment}"
   description = "security_group_test_2_lb"
   vpc_id      = var.vpc
