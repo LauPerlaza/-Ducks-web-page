@@ -7,7 +7,7 @@ resource "aws_lb" "lb_test_2" {
     enable_deletion_protection = false
 
     tags = {
-      Name = "lb_test_2${var.environment}"
+      Name = "lb_test_2_${var.environment}"
       Created_by = "Terraform"
     }
 }

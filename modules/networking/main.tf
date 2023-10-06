@@ -52,7 +52,7 @@ resource "aws_subnet" "sub_private2" {
 resource "aws_internet_gateway" "igw_test_2" {
   vpc_id = aws_vpc.vpc_test_2.id
   tags = {
-    Name = "internet_gateway_test_2${var.environment}"
+    Name = "internet_gateway_test_2_${var.environment}"
   }
 }
 #   #   # AWS ROUTE TABLE #  #   #
@@ -63,7 +63,7 @@ resource "aws_route_table" "route_table_test_2" {
     gateway_id = aws_internet_gateway.igw_test_2.id
   }
   tags = {
-    Name = "route_table_test_2${var.environment}"
+    Name = "rt_test_2_${var.environment}"
   }
 }
 #   #   # AWS ROUTE TABLE ASSOCIATION  #  #   #
@@ -95,6 +95,6 @@ resource "aws_security_group" "sec_test_2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "security_gruop_test_2${var.environment}"
+    Name = "sg_test_2_${var.environment}"
   }
 }
