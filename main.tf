@@ -83,6 +83,6 @@ module "lb_test_2" {
   source = "./modules/alb"
   environment = var.environment
   subnets = [module.networking_test_2.subnet_id_sub_public1, module.networking_test_2.subnet_id_sub_public2]
-  security_group = aws_security_group.sg_lb.id
+  security_group = [aws_security_group.sg_lb.id]
   target_group = module.tg_test_2.TargetGroup_arn
 }
