@@ -1,6 +1,6 @@
-output "TargetGroup_ARN" {
+output "TargetGroup_arn" {
     value = aws_lb_target_group.tg_test_2.arn
 }
-output "TargetGroup_Name" {
+output "TargetGroup_name" {
     value = aws_lb_target_group.tg_test_2.name
 }

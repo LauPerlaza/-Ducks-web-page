@@ -3,6 +3,9 @@ resource "aws_lb" "lb_test_2" {
     load_balancer_type = "application"
     security_groups = [var.security_group]
     subnets = [var.subnets[0], var.subnets[1]]
+    internal           = false
+    enable_http2       = true
+    idle_timeout       = 30
 
     enable_deletion_protection = false
 

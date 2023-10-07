@@ -63,7 +63,7 @@ resource "aws_route_table" "route_table_test_2" {
     gateway_id = aws_internet_gateway.igw_test_2.id
   }
   tags = {
-    Name = "rt_test_2_${var.environment}"
+    Name = "route_table_test_2_${var.environment}"
   }
 }
 #   #   # AWS ROUTE TABLE ASSOCIATION  #  #   #

@@ -10,11 +10,21 @@ variable "vpc" {
   type = string
 }
 
-variable "target_type" {
+variable "tg_type" {
   type = string
 }
 
 variable "protocol" {
   type    = string
   default = "HTTP"
+}
+
+variable "health_check_path" {
+  type        = string
+  default     = ""
+}
+
+variable "health_check_port" {
+  type        = number
+  default     = 80
 }

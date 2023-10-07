@@ -32,6 +32,7 @@ resource "aws_security_group" "security_group_ec2_test_2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 module "ec2_test" {
   depends_on    = [aws_security_group.security_group_ec2_test_2, module.networking_test_2]
   source        = "./modules/ec2"
@@ -41,22 +42,48 @@ module "ec2_test" {
   name          = "ec2_test_2"
   environment   = var.environment
 }
-
-module "sg_lb" {
-    source = "./modules/security_group"
-    environment = var.environment
-    vpc = module.networking_test_2.vpc_id
-    port_to_allow  = 80
-    cidr_to_allow = ["0.0.0.0/0"]
+resource "aws_lb_target_group_attachment" "test" {
+  target_group_arn = module.TargetGroup.TargetGroup_arn
+  target_id        = module.ec2_test.instance_id
+  port             = 80
 }
-
 module "tg_test_2" {
   source = "./modules/TargetGroup"
   environment = var.environment
   vpc = module.networking_test_2.vpc_id
-  target_type = "instance"
+  tg_type = "instance"
   tg_port = 80
+  protocol = "HTTP"
+  health_check_path = "/var/www/html"
 }
 
+resource "aws_security_group" "sg_lb" {
+  name        = "sg_lb_${var.environment}"
+  description = "controls access to the ALB"
+  vpc_id      = module.networking_test_2.vpc_id
+  tags = {
+    Name = "sg_lb_${var.environment}"
+  }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    security_groups = [module.sg_lb.sg_id]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
+module "lb_test_2" {
+  source = "./modules/alb"
+  environment = var.environment
+  subnets = [module.networking_test_2.cidr_block_subnet_public[0], module.networking_test_2.cidr_block_subnet_public[1]]
+  security_group = [module.sg_lb.sg_id]
+  target_group = module.TargetGroup.TargetGroup_arn
+  
+}
