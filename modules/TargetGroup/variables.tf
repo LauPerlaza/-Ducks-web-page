@@ -28,3 +28,7 @@ variable "health_check_port" {
   type        = number
   default     = 80
 }
+
+variable "name_tg" {
+  type = string  
+}

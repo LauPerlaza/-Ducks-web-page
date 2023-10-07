@@ -1,7 +1,7 @@
 resource "aws_lb" "lb_test_2" {
-    name = "lb_test_2_${var.environment}"
+    name = "lb-test-2"
     load_balancer_type = "application"
-    security_groups = [var.security_group]
+    security_groups = var.security_group
     subnets = [var.subnets[0], var.subnets[1]]
     internal           = false
     enable_http2       = true
@@ -16,7 +16,7 @@ resource "aws_lb" "lb_test_2" {
 }
 
 resource "aws_lb_listener" "HTTP_listener" {
-    load_balancer_arn = aws_lb.lb_test_2.arn
+    load_balancer_arn = aws_lb.lb_test_2.id
     port = "80"
     protocol = "HTTP"
     default_action {

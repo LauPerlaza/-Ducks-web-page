@@ -7,7 +7,7 @@ variable "subnets" {
 }
 
 variable "security_group" {
-  type = string
+  type = list
 }
 
 variable "target_group" {
