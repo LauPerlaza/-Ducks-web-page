@@ -10,8 +10,7 @@ variable "subnets" {
 
 variable "security_group" {
   description = "Security group id for the ALB"
-  type        = string
-  default     = ""
+  type        = list(any)
 }
 
 variable "target_group" {
@@ -19,42 +18,11 @@ variable "target_group" {
   type = string
 }
 
-variable "tg_port" {
-  description = "the port that the targer group will use"
-  type        = number
-  default     = 80
+variable "name_lb" {
+  description = "a name for alb"
+  type        = string
 }
 
-variable "vpc" {
-  description = "VPC id for Target Group"
+variable "cert_arn" {
   type = string
-}
-
-variable "tg_type" {
-  description = "Target Group Type (instance,ip,lambda)"
-  type        = string
-  default     = ""
-}
-
-variable "protocol" {
-  description = "Protocol that the target group will use"
-  type        = string
-  default     = ""
-}
-
-variable "health_check_path" {
-  description = "the Path in which the alb will send health checks"
-  type        = string
-  default     = ""
-}
-
-variable "health_check_port" {
-  description = "the Port in which the alb will send health checks"
-  type        = number
-  default     = 80
-}
-
-variable "name_tg" {
-  description = "a name for target group or alb"
-  type        = string
 }
