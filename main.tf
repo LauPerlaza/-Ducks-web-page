@@ -1,4 +1,4 @@
-#Este modulo crea el networking de la infraestructura 
+#Networking resources creation
 
 module "networking_test_2" {
   source                      = "./modules/networking"
@@ -10,8 +10,7 @@ module "networking_test_2" {
   cidr_block_subnet_public    = ["10.0.1.0/24", "10.0.2.0/24"]
   cidr_block_subnet_private   = ["10.0.6.0/24", "10.0.7.0/24"]
 }
-#Este recurso crea un grupo de seguridad para la instancia de EC2. 
-#Dependiendo del módulo "networking_test_2"
+## Security Group for EC2
 
 resource "aws_security_group" "sec_ec2_test_2" {
   depends_on  = [module.networking_test_2]
@@ -33,6 +32,8 @@ resource "aws_security_group" "sec_ec2_test_2" {
   }
 }
 
+### EC2 resources creation
+
 module "ec2_test" {
   depends_on    = [aws_security_group.sec_ec2_test_2, module.networking_test_2]
   source        = "./modules/ec2"
@@ -43,12 +44,15 @@ module "ec2_test" {
   environment   = var.environment
 }
 resource "aws_lb_target_group_attachment" "test" {
-  target_group_arn = module.tg_test_2.TargetGroup_arn
+  target_group_arn = module.app_lb.TargetGroup_arn
   target_id        = module.ec2_test.instance_id
   port             = 80
 }
-module "tg_test_2" {
-  source = "./modules/TargetGroup"
+
+#### Target Groups Creation
+
+module "target_group" {
+  source = "./modules/alb"
   name_tg   = "tg-lb-${var.environment}"
   environment = var.environment
   vpc = module.networking_test_2.vpc_id
@@ -57,6 +61,8 @@ module "tg_test_2" {
   protocol = "HTTP"
   health_check_path = "/var/www/html"
 }
+
+##### Security Group for ALB
 
 resource "aws_security_group" "sg_lb" {
   name        = "sg_lb_${var.environment}"
@@ -78,11 +84,13 @@ resource "aws_security_group" "sg_lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+###### ALB creation
 
-module "lb_test_2" {
+module "application_lb" {
   source = "./modules/alb"
   environment = var.environment
   subnets = [module.networking_test_2.subnet_id_sub_public1, module.networking_test_2.subnet_id_sub_public2]
   security_group = [aws_security_group.sg_lb.id]
-  target_group = module.tg_test_2.TargetGroup_arn
+  target_group = module.app_lb.TargetGroup_arn
 }
+
