@@ -12,7 +12,7 @@ module "networking_test_2" {
 }
 ## Security Group for EC2
 
-resource "aws_security_group" "sec_ec2_test_2" {
+resource "aws_security_group" "sec_ec2_test2" {
   depends_on  = [module.networking_test_2]
   name        = "secg_ec2_test_${var.environment}"
   description = "controls access to the EC2"
@@ -35,11 +35,11 @@ resource "aws_security_group" "sec_ec2_test_2" {
 ### EC2 resources creation
 
 module "ec2_test" {
-  depends_on    = [aws_security_group.sec_ec2_test_2, module.networking_test_2]
+  depends_on    = [aws_security_group.sec_ec2_test2, module.networking_test_2]
   source        = "./modules/ec2"
   instance_type = var.environment == "staging" ? "t2.micro" : "t3.micro"
   subnet_id     = module.networking_test_2.subnet_id_sub_public1
-  sg_ids        = [aws_security_group.sec_ec2_test_2.id]
+  sg_ids        = [aws_security_group.sec_ec2_test2.id]
   name          = "ec2_test_2_${var.environment}"
   environment   = var.environment
 }
@@ -54,7 +54,7 @@ module "target_group" {
   tg_type           = "instance"
   tg_port           = 80
   protocol          = "HTTP"
-  health_check_path = "/var/www/html"
+  health_check_path = "/"
 }
 
 ##### Target Group Attachment Creation
@@ -89,6 +89,7 @@ resource "aws_security_group" "sg_lb" {
 ###### ALB creation
 
 module "application_lb" {
+  depends_on     = [aws_security_group.sg_lb, module.acm_cert]
   source         = "./modules/alb"
   name_lb        = "alb-test-2"
   environment    = var.environment
