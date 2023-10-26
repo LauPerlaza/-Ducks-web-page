@@ -43,6 +43,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
       "AutoScalingGroupName" = aws_autoscaling_group.autoscaling_group_test2.name
     }
     actions_enabled = true
-    alarm_actions = aws_autoscaling_policy.cpu_policy_autocaling.arn
+    alarm_actions = [aws_autoscaling_policy.cpu_policy_autocaling.arn]
 }
   
