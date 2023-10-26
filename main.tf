@@ -2,7 +2,7 @@
 
 module "networking_test_2" {
   source                    = "./modules/networking"
-  ip                        = "67.73.233.197/32"
+  ip                        = "190.5.196.117/32"
   region                    = var.region
   environment               = var.environment
   name_vpc                  = "vpc_test_2"
