@@ -9,12 +9,12 @@ variable "environment" {
 }
 
 variable "domain_name" {
-  type = string
+  type    = string
   default = "rootdr.info"
 }
 
 variable "alternative_name" {
-  type = string
+  type    = string
   default = "value"
-  
+
 }

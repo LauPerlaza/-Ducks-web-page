@@ -40,7 +40,7 @@ module "ec2_test" {
   instance_type = var.environment == "staging" ? "t2.micro" : "t3.micro"
   subnet_id     = module.networking_test_2.subnet_id_sub_public1
   sg_ids        = [aws_security_group.sec_ec2_test2.id]
-  name          = "ec2_test_2_${var.environment}"
+  name          = "ducks-web-page"
   environment   = var.environment
 }
 
@@ -75,9 +75,9 @@ resource "aws_security_group" "sg_lb" {
   }
 
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
@@ -98,13 +98,63 @@ module "application_lb" {
   security_group = [aws_security_group.sg_lb.id]
   target_group   = module.target_group.tg_arn
   cert_arn       = module.acm_cert.acm_arn
-  
+
 }
 
 ####### ACM creation
 module "acm_cert" {
-  source      = "./modules/acm"
-  domain_name = "rootdr.info"
+  source           = "./modules/acm"
+  domain_name      = "rootdr.info"
   alternative_name = "ducks.rootdr.info"
 }
+
+###### Security Group for AutoScaling
+
+resource "aws_security_group" "sg_autoscaling" {
+  name        = "sg_autoscaling_${var.environment}"
+  description = "controls access to the autoscaling"
+  vpc_id      = module.networking_test_2.vpc_id
+  tags = {
+    Name = "sg_autoscaling_${var.environment}"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_launch_configuration" "launch_conf" {
+  depends_on      = [aws_security_group.sg_autoscaling]
+  name            = "launchconfig_${var.environment}"
+  image_id        = "ami-03840149f6ed0b664"
+  instance_type   = var.environment == "staging" ? "t2.micro" : "t3.micro"
+  key_name        = "key_web_server"
+  security_groups = [aws_security_group.sg_autoscaling.id]
+}
+
+####### AutoScaling creation
+module "autoscaling" {
+  depends_on           = [aws_security_group.sg_autoscaling, aws_launch_configuration.launch_conf]
+  source               = "./modules/autoscaling"
+  name                 = "autoscaling_test2_${var.environment}"
+  vpc_zone_identifier  = [module.networking_test_2.subnet_id_sub_public1, module.networking_test_2.subnet_id_sub_public2]
+  launch_configuration = aws_launch_configuration.launch_conf.name
+  max_size             = 2
+  min_size             = 1
+  target_group_arns    = [module.target_group.tg_arn]
+
+
+
+}
+
+
 
