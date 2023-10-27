@@ -153,10 +153,5 @@ module "autoscaling" {
   target_group_arns    = [module.target_group.tg_arn]
 }
 
-resource "aws_autoscaling_attachment" "autoscaling_attachment" {
-  autoscaling_group_name = module.autoscaling_group_test2.id
-  lb_target_group_arn    = module.target_group.tg_arn
-}
-
 
 
