@@ -132,6 +132,8 @@ resource "aws_security_group" "sg_autoscaling" {
   }
 }
 
+###### aws launch configuration creation
+
 resource "aws_launch_configuration" "launch_conf" {
   depends_on      = [aws_security_group.sg_autoscaling]
   name            = "launchconfig_${var.environment}"
