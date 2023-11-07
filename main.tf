@@ -10,39 +10,6 @@ module "networking_test_2" {
   cidr_block_subnet_public  = ["10.0.1.0/24", "10.0.2.0/24"]
   cidr_block_subnet_private = ["10.0.6.0/24", "10.0.7.0/24"]
 }
-## Security Group for EC2
-
-resource "aws_security_group" "sec_ec2_test2" {
-  depends_on  = [module.networking_test_2]
-  name        = "secg_ec2_test_${var.environment}"
-  description = "controls access to the EC2"
-  vpc_id      = module.networking_test_2.vpc_id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg_lb.id]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-### EC2 resources creation
-
-module "ec2_test" {
-  depends_on    = [aws_security_group.sec_ec2_test2, module.networking_test_2]
-  source        = "./modules/ec2"
-  instance_type = var.environment == "staging" ? "t2.micro" : "t3.micro"
-  subnet_id     = module.networking_test_2.subnet_id_sub_public1
-  sg_ids        = [aws_security_group.sec_ec2_test2.id]
-  name          = "ducks-web-page"
-  environment   = var.environment
-}
 
 #### Target Groups Creation
 
@@ -55,13 +22,6 @@ module "target_group" {
   tg_port           = 80
   protocol          = "HTTP"
   health_check_path = "/"
-}
-
-##### Target Group Attachment Creation
-resource "aws_lb_target_group_attachment" "tg_attachment" {
-  target_group_arn = module.target_group.tg_arn
-  target_id        = module.ec2_test.instance_id
-  port             = 80
 }
 
 ###### Security Group for ALB
@@ -78,6 +38,12 @@ resource "aws_security_group" "sg_lb" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "HTTPS"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
